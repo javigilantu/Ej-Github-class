@@ -22,7 +22,7 @@ STREET")
  places['address'].append(street + ' ' + str(number))
  return pd.DataFrame(places)
 
- list_health = [“bichitos de colores súper chulos”]
+ list_health = ["hospital", "clinic", "doctors"]
 dataframes = []
 for amenity in list_health:
  overpass_url = "http://overpass-api.de/api/interpreter"
@@ -57,4 +57,4 @@ popup=row.name,
 icon=folium.Icon(icon='glyphicon glyphicon-heart-empty',
 color='blue')))
 some_map2.add_child(mc)
-some_map2.save('templates/bichitosdecolores.html')
+some_map2.save('templates/map.html')
