@@ -19,55 +19,55 @@ df_final = df_final[[ "Country_Region" , "Province_State" , "Lat" , "Long_" , "C
 def convertTime(t):
     t = int(t)
     return datetime.fromtimestamp(t)
+    df_final = df_final.dropna(subset=[ "Last_Update" ])
+    df_final[ "Province_State" ].fillna(value= "" , inplace= True )
+    df_final[ "Last_Update" ]= df_final[ "Last_Update" ]/ 1000
+    df_final[ "Last_Update" ] = df_final[ "Last_Update" ].apply(convertTime)
+    df_total = df_final.groupby( "Country_Region" ,
+    as_index= False ).agg(
+    {
+    "Confirmed" : "sum" ,
+    "Deaths" : "sum" ,
+    "Recovered" : "sum"
+    }
+    )
+    total_confirmed = df_final[ "Confirmed" ].sum()
+    total_recovered = df_final[ "Recovered" ].sum()
+    total_deaths = df_final[ "Deaths" ].sum()
+    df_top10 = df_total.nlargest( 10 , "Confirmed" )
+    top10_countries_1 = df_top10[ "Country_Region" ].tolist()
+    top10_confirmed = df_top10[ "Confirmed" ].tolist()
+    df_top10 = df_total.nlargest( 10 , "Recovered" )
+    top10_countries_2 = df_top10[ "Country_Region" ].tolist()
+    top10_recovered = df_top10[ "Recovered" ].tolist()
+    df_top10 = df_total.nlargest( 10 , "Deaths" )
+    top10_countries_3 = df_top10[ "Country_Region" ].tolist()
+    top10_deaths = df_top10[ "Deaths" ].tolist()
 
-df_final = df_final.dropna(subset=[ "Last_Update" ])
-df_final[ "Province_State" ].fillna(value= "" , inplace= True )
-df_final[ "Last_Update" ]= df_final[ "Last_Update" ]/ 1000
-df_final[ "Last_Update" ] = df_final[ "Last_Update" ].apply(convertTime)
-df_total = df_final.groupby( "Country_Region" ,
-as_index= False ).agg(
-{
-"Confirmed" : "sum" ,
-"Deaths" : "sum" ,
-"Recovered" : "sum"
-}
-)
-total_confirmed = df_final[ "Confirmed" ].sum()
-total_recovered = df_final[ "Recovered" ].sum()
-total_deaths = df_final[ "Deaths" ].sum()
-df_top10 = df_total.nlargest( 10 , "Confirmed" )
-top10_countries_1 = df_top10[ "Country_Region" ].tolist()
-top10_confirmed = df_top10[ "Confirmed" ].tolist()
-df_top10 = df_total.nlargest( 10 , "Recovered" )
-top10_countries_2 = df_top10[ "Country_Region" ].tolist()
-top10_recovered = df_top10[ "Recovered" ].tolist()
-df_top10 = df_total.nlargest( 10 , "Deaths" )
-top10_countries_3 = df_top10[ "Country_Region" ].tolist()
-top10_deaths = df_top10[ "Deaths" ].tolist()
 
-
-fig = make_LO_QUE_TE_DE_LA_GANA(
+fig = make_subplots(
     rows = 4 , cols = 6 ,
-    
     specs=[
-            [{ "type" : "scattergeo" , "rowspan" : 4 , "colspan" : 3 },
+        [{ "type" : "scattergeo" , "rowspan" : 4 , "colspan" : 3 },
 None , None , { "type" : "indicator" }, { "type" : "indicator" },
 { "type" : "indicator" } ],
-            [ None , None , None , { "type" : "bar" ,
+        [ None , None , None , { "type" : "bar" ,
 "colspan" : 3 }, None , None ],
-            [ None , None , None , { "type" : "bar" ,
+        [ None , None , None , { "type" : "bar" ,
 "colspan" : 3 }, None , None ],
-            [ None , None , None , { "type" : "bar" ,
+        [ None , None , None , { "type" : "bar" ,
 "colspan" : 3 }, None , None ],
-            ]
+        ]
 )
-
 message = df_final[ "Country_Region" ] + " " + df_final[ "Province_State" ] + "<br>"
-message += "Confirmed: " + df_final[ "Confirmed" ].astype(str) + "<br>"
+message += "Confirmed: " + df_final[ "Confirmed" ].astype(str) +
+"<br>"
 message += "Deaths: " + df_final[ "Deaths" ].astype(str) + "<br>"
-message += "Recovered: " + df_final[ "Recovered" ].astype(str) + "<br>"
+message += "Recovered: " + df_final[ "Recovered" ].astype(str) +
+"<br>"
 message += "Last updated: " + df_final[ "Last_Update" ].astype(str)
 df_final[ "text" ] = message
+
 
 fig.add_trace(
     go.Scattergeo(
@@ -95,7 +95,6 @@ fig.add_trace(
     ),
     row= 1 , col= 1
 )
-
 
 fig.add_trace(
     go.Indicator(
@@ -173,13 +172,12 @@ fig.update_layout(
     ),
     annotations=[
         dict(
-            text= "Source: https://bit.ly/3aEzxjK" ,
-            showarrow= False ,
-            xref= "paper" ,
-            yref= "paper" ,
-            x= 0.35 ,
-            y= 0 )
+        text= "Source: https://bit.ly/3aEzxjK" ,
+        showarrow= False ,
+        xref= "paper" ,
+        yref= "paper" ,
+        x= 0.35 ,
+        y= 0 )
     ]
 )
-
-fig.write_html( 'templates/quedivertidoesesteejercicio.html' )
+fig.write_html( 'templates/dashboard.html' )
